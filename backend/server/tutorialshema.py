@@ -14,4 +14,4 @@ from app import marshmallow
 
 class TutorialSchema(marshmallow.Schema):
     class Meta:
-        fields = ('name', 'level')
+        fields = ('id','name', 'level')

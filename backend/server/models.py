@@ -9,5 +9,25 @@ class Tutorial (db.Model):
         self.name = name
         self.level = level
     
+class Exercise (db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), unique=True, nullable=False)
+    exercisequestions = db.relationship('ExerciseQuestion')
+    
+    def __init__(self, name):
+        self.name = name
+
+    
+class ExerciseQuestion (db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    exercise_id = db.Column(db.Integer, db.ForeignKey('exercise.id'), nullable=False)
+    title = db.Column(db.String(100), nullable=False)
+    description = db.Column(db.Text, nullable=False)
+    #exercise = db.relationship('Exercise', back_populates = 'exercise')
+    
+    def __init__(self, exercise_id, title, description):
+        self.exercise_id = exercise_id
+        self.title = title
+        self.description = description
 
     #def alreadyExists(self, name, level):
