@@ -31,7 +31,7 @@ api = Api(app)
 #tutorial_schema = TutorialSchema(strict=True)
 #tutorials_shema = TutorialSchema(many=True, strict=True)
 
-
+#db.create_all()
 
 
 
