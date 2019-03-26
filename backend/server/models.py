@@ -15,11 +15,13 @@ class Exercise (db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), unique=True, nullable=False)
     uploadedfile = db.Column(db.String(100), unique=True, nullable=False)
+    exercisetype = db.Column(db.String(20), nullable=False)
     exercisequestions = db.relationship('ExerciseQuestion')
 
-    def __init__(self, name, uploadedfile):
+    def __init__(self, name, uploadedfile, exercisetype):
         self.name = name
         self.uploadedfile = uploadedfile
+        self.exercisetype = exercisetype
 
 
 class ExerciseQuestion (db.Model):

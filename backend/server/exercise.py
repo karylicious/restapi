@@ -1,6 +1,9 @@
 from flask_restful import Resource
 from flask import Flask, jsonify, request
+import shutil
+import os
 
+ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 
 class ExerciseManagement(Resource):
     def post(self):
@@ -15,11 +18,11 @@ class ExerciseManagement(Resource):
         total += 1
         data = request.json
 
-        new_exercise = Exercise("Exercise " + str(total), data['uploadedfile'])
+        new_exercise = Exercise("Exercise " + str(total), data['uploadedfile'], data['type'])
         db.session.add(new_exercise)
         db.session.commit()
 
-        print(data)
+       
         for question in data['questions']:
             new_exercisequestion = ExerciseQuestion(
                 new_exercise.id, question['title'], question['description'])
@@ -34,24 +37,40 @@ class ExerciseManagement(Resource):
         from exerciseschema import ExerciseSchema
         from exercisequestionschema import ExerciseQuestionSchema
         db.create_all()
+        data = request.json
+
+        ExerciseQuestion.query.filter(
+        ExerciseQuestion.exercise_id == data['id']).delete()
+        db.session.commit()
+
+        exercise = Exercise.query.get(data['id'])
+        previousFile = exercise.uploadedfile
+        exerciseName = exercise.name
+        exerciseType = exercise.exercisetype
+
+        db.session.delete(exercise)
+        db.session.commit()
 
         
-        data = request.json
+        if data['uploadedfile'] is not None:
+            userDirectory = ROOT_DIR + '/uploads/' + previousFile
+            shutil.rmtree(userDirectory)
+            uploadedfile = data['uploadedfile']
+        else:
+            uploadedfile = previousFile
+
+        new_exercise = Exercise(exerciseName, uploadedfile, exerciseType)
+        db.session.add(new_exercise)
+        db.session.commit()
+
+       
         for question in data['questions']:
-            exerciseID = question['exercise_id']
-            exercisequestion = ExerciseQuestion.query.get(
-                question['exercise_question_id'])
-            exercisequestion.title = question['title']
-            exercisequestion.description = question['description']
+            new_exercisequestion = ExerciseQuestion(
+                new_exercise.id, question['title'], question['description'])
+            db.session.add(new_exercisequestion)
             db.session.commit()
 
-        questions = ExerciseQuestion.query.filter_by(
-            exercise_id=exerciseID).all()
-
-        exercise_questions_schema = ExerciseQuestionSchema(
-            many=True, strict=True)
-        result = exercise_questions_schema.dump(questions)
-        return jsonify(result.data)
+        return jsonify({"succeed": "true"})
 
     def get(self):
         from app import db
