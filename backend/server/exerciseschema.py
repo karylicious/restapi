@@ -2,4 +2,4 @@ from app import marshmallow
 
 class ExerciseSchema(marshmallow.Schema):
     class Meta:
-        fields = ('id','name', 'uploadedfile', 'exercisetype')
+        fields = ('id','name', 'uploadedfile', 'exercisetype', 'expectedClientEntryPoint', 'serverDirectoryNameOnDeployment')

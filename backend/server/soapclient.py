@@ -8,7 +8,7 @@ ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 class Project:
 
     def readFileIntoByte(self, userDir, selectedFileName):
-        userFile = ROOT_DIR + '\\uploads\\' + userDir + '\\' + selectedFileName + '.zip'
+        userFile = ROOT_DIR + '\\uploads\\' + userDir
         return open(userFile, "rb").read()
 
     def testClient(self, clientEntryPoint, userDir, selectedFileName):
@@ -18,3 +18,9 @@ class Project:
     def testClientServer(self, clientEntryPoint, userDir, selectedFileName):
         selectedFileBytes = self.readFileIntoByte(userDir, selectedFileName)
         return CLIENT.service.testClientAndServer(clientEntryPoint, selectedFileBytes, selectedFileName)
+
+
+    def deployServer(self, userDir, selectedFileName):
+        selectedFileBytes = self.readFileIntoByte(userDir, selectedFileName)
+        return CLIENT.service.deployServer(selectedFileBytes, selectedFileName)
+   

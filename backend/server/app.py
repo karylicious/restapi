@@ -27,11 +27,7 @@ CORS(app)
 api = Api(app)
 
 
-# Init shema
-#tutorial_schema = TutorialSchema(strict=True)
-#tutorials_shema = TutorialSchema(many=True, strict=True)
-
-db.create_all()
+#db.create_all() # this is used only when initializing the database for the first time
 
 
 

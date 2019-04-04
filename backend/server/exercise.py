@@ -2,6 +2,7 @@ from flask_restful import Resource
 from flask import Flask, jsonify, request
 import shutil
 import os
+from soapclient import Project
 
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -11,25 +12,35 @@ class ExerciseManagement(Resource):
         from models import Exercise, ExerciseQuestion
         from exerciseschema import ExerciseSchema
         from exercisequestionschema import ExerciseQuestionSchema
+        
 
         db.create_all()
 
-        total = Exercise.query.count()
-        total += 1
         data = request.json
+        soapClient = Project()
 
-        new_exercise = Exercise("Exercise " + str(total), data['uploadedfile'], data['type'])
-        db.session.add(new_exercise)
-        db.session.commit()
-
-       
-        for question in data['questions']:
-            new_exercisequestion = ExerciseQuestion(
-                new_exercise.id, question['title'], question['description'])
-            db.session.add(new_exercisequestion)
+        response = soapClient.deployServer(data['uploadedfile'], data['selectedFileName'])
+        if response is None:
+            return jsonify({"succeed": "false"})
+        else:
+            serverDirectoryNameOnDeployment = response   
+            
+            total = Exercise.query.count()
+            total += 1
+            
+            
+            new_exercise = Exercise("Exercise " + str(total), data['uploadedfile'], data['type'], data['expectedClientEntryPoint'], serverDirectoryNameOnDeployment)
+            db.session.add(new_exercise)
             db.session.commit()
 
-        return jsonify({"succeed": "true"})
+        
+            for question in data['questions']:
+                new_exercisequestion = ExerciseQuestion(
+                    new_exercise.id, question['title'], question['description'], question['expectedOutput'], question['points'])
+                db.session.add(new_exercisequestion)
+                db.session.commit()
+    
+            return jsonify({"succeed": "true"})
 
     def put(self):
         from app import db
@@ -59,14 +70,14 @@ class ExerciseManagement(Resource):
         else:
             uploadedfile = previousFile
 
-        new_exercise = Exercise(exerciseName, uploadedfile, exerciseType)
+        new_exercise = Exercise(exerciseName, uploadedfile, exerciseType, data['expectedClientEntryPoint'])
         db.session.add(new_exercise)
         db.session.commit()
 
        
         for question in data['questions']:
             new_exercisequestion = ExerciseQuestion(
-                new_exercise.id, question['title'], question['description'])
+                new_exercise.id, question['title'], question['description'], question['expectedOutput'], question['points'])
             db.session.add(new_exercisequestion)
             db.session.commit()
 
