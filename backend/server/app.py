@@ -27,7 +27,7 @@ CORS(app)
 api = Api(app)
 
 
-#db.create_all() # this is used only when initializing the database for the first time
+db.create_all() # this is used only when initializing the database for the first time
 
 
 

@@ -9,5 +9,6 @@ class Directory(Resource):
     def delete(self):
         args = request.args
         userDirectory = ROOT_DIR + '/uploads/' + args['dir']
-        shutil.rmtree(userDirectory)
+        if os.path.isdir(userDirectory):
+            shutil.rmtree(userDirectory)
         return jsonify({"succeed": 'true'})

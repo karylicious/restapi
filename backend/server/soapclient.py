@@ -23,4 +23,7 @@ class Project:
     def deployServer(self, userDir, selectedFileName):
         selectedFileBytes = self.readFileIntoByte(userDir, selectedFileName)
         return CLIENT.service.deployServer(selectedFileBytes, selectedFileName)
+
+    def undeployServer(self, selectedFileName):
+        return CLIENT.service.undeployServer(selectedFileName)
    

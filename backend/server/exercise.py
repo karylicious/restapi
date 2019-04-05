@@ -13,7 +13,6 @@ class ExerciseManagement(Resource):
         from exerciseschema import ExerciseSchema
         from exercisequestionschema import ExerciseQuestionSchema
         
-
         db.create_all()
 
         data = request.json
@@ -21,22 +20,24 @@ class ExerciseManagement(Resource):
 
         response = soapClient.deployServer(data['uploadedfile'], data['selectedFileName'])
         if response is None:
-            return jsonify({"succeed": "false"})
-        else:
+            return jsonify({"succeed": "false", "info": "Unexpected error has occured. Please try again."})
+        if "/" not in response:
+            return jsonify({"succeed": "false", "info": response})
+        elif "/" in response:
             serverDirectoryNameOnDeployment = response   
             
             total = Exercise.query.count()
             total += 1
             
             
-            new_exercise = Exercise("Exercise " + str(total), data['uploadedfile'], data['type'], data['expectedClientEntryPoint'], serverDirectoryNameOnDeployment)
+            new_exercise = Exercise("Exercise " + str(total), data['uploadedfile'], data['type'], data['description'], data['expectedClientEntryPoint'], serverDirectoryNameOnDeployment)
             db.session.add(new_exercise)
             db.session.commit()
 
         
             for question in data['questions']:
                 new_exercisequestion = ExerciseQuestion(
-                    new_exercise.id, question['title'], question['description'], question['expectedOutput'], question['points'])
+                    new_exercise.id, question['title'], question['description'], question['expectedInvokedMethod'], question['expectedOutput'], question['points'])
                 db.session.add(new_exercisequestion)
                 db.session.commit()
     
@@ -50,6 +51,12 @@ class ExerciseManagement(Resource):
         db.create_all()
         data = request.json
 
+        exercise_by_id = Exercise.query.filter_by(id=data['id']).first()
+
+        if exercise_by_id is None:
+            return jsonify({"succeed": 'false', "info": "There is no exercise with that id."})
+
+
         ExerciseQuestion.query.filter(
         ExerciseQuestion.exercise_id == data['id']).delete()
         db.session.commit()
@@ -57,27 +64,37 @@ class ExerciseManagement(Resource):
         exercise = Exercise.query.get(data['id'])
         previousFile = exercise.uploadedfile
         exerciseName = exercise.name
-        exerciseType = exercise.exercisetype
+        exerciseType = exercise.exerciseType
+        previousServerDirectoryNameOnDeployment = exercise.serverDirectoryNameOnDeployment
 
         db.session.delete(exercise)
         db.session.commit()
 
         
         if data['uploadedfile'] is not None:
-            userDirectory = ROOT_DIR + '/uploads/' + previousFile
-            shutil.rmtree(userDirectory)
+            directory = previousFile.split("/")
+            userDirectory = ROOT_DIR + '/uploads/' + directory[0]
+            if os.path.isdir(userDirectory):
+                shutil.rmtree(userDirectory)
             uploadedfile = data['uploadedfile']
+
+            soapClient = Project()
+            response = soapClient.deployServer(data['uploadedfile'], data['selectedFileName'])
+            if response is None:
+                serverDirectoryNameOnDeployment = previousServerDirectoryNameOnDeployment
+            else:
+                serverDirectoryNameOnDeployment = response  
         else:
             uploadedfile = previousFile
 
-        new_exercise = Exercise(exerciseName, uploadedfile, exerciseType, data['expectedClientEntryPoint'])
+        new_exercise = Exercise(exerciseName, uploadedfile, exerciseType, data['description'], data['expectedClientEntryPoint'], serverDirectoryNameOnDeployment)
         db.session.add(new_exercise)
         db.session.commit()
 
        
         for question in data['questions']:
             new_exercisequestion = ExerciseQuestion(
-                new_exercise.id, question['title'], question['description'], question['expectedOutput'], question['points'])
+                new_exercise.id, question['title'], question['description'], question['expectedInvokedMethod'], question['expectedOutput'], question['points'])
             db.session.add(new_exercisequestion)
             db.session.commit()
 
@@ -107,11 +124,22 @@ class ExerciseManagement(Resource):
         if exercise_by_id is None:
             return jsonify({"succeed": 'false', "info": "There is no exercise with that id."})
 
+        exercise = Exercise.query.get(exerciseIDArg)
+        
+        directory = exercise.uploadedfile.split("/")
+        userDirectory = ROOT_DIR + '/uploads/' + directory[0]
+        if os.path.isdir(userDirectory):
+            shutil.rmtree(userDirectory)
+
+        soapClient = Project()
+        soapClient.undeployServer(exercise.serverDirectoryNameOnDeployment)
+
+
         ExerciseQuestion.query.filter(
             ExerciseQuestion.exercise_id == exerciseIDArg).delete()
         db.session.commit()
 
-        exercise = Exercise.query.get(exerciseIDArg)
+        
         db.session.delete(exercise)
         db.session.commit()
         tt = Exercise.query.count()
