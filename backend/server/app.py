@@ -1,4 +1,4 @@
-from flask import Flask#, jsonify, request
+from flask import Flask  # , jsonify, request
 from flask_restful import Api
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
@@ -18,7 +18,8 @@ from exercisequestion import ExerciseQuestionManagement
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 app = Flask(__name__)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(ROOT_DIR, 'db.sqlite')
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + \
+    os.path.join(ROOT_DIR, 'db.sqlite')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 marshmallow = Marshmallow(app)
@@ -27,9 +28,8 @@ CORS(app)
 api = Api(app)
 
 
-db.create_all() # this is used only when initializing the database for the first time
-
-
+# this is meant to be used only when initializing the database for the first time
+db.create_all()
 
 
 api.add_resource(Upload, '/uploadfile')
