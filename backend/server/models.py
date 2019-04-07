@@ -13,7 +13,6 @@ class Tutorial (db.Model):
 
 class Exercise (db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100), unique=True, nullable=False)
     uploadedfile = db.Column(db.String(100), unique=True, nullable=False)
     exerciseType = db.Column(db.String(20), nullable=False)
     description = db.Column(db.Text, nullable=False)
@@ -21,8 +20,7 @@ class Exercise (db.Model):
     serverDirectoryNameOnDeployment = db.Column(db.String(200), nullable=False)
     exercisequestions = db.relationship('ExerciseQuestion')
 
-    def __init__(self, name, uploadedfile, exerciseType, description, expectedClientEntryPoint, serverDirectoryNameOnDeployment):
-        self.name = name
+    def __init__(self, uploadedfile, exerciseType, description, expectedClientEntryPoint, serverDirectoryNameOnDeployment):    
         self.uploadedfile = uploadedfile
         self.exerciseType = exerciseType
         self.description = description

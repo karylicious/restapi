@@ -16,12 +16,12 @@ class ExerciseQuestionManagement(Resource):
             id=exerciseQuestionIDArg).first()
 
         if exerciseQuestion_by_id is None:
-            return jsonify({"succeed": 'false', "info": "There is no question with that id."})
+            return jsonify({"succeed": False, "info": "There is no question with that id."})
 
         exerciseQuestion = ExerciseQuestion.query.get(exerciseQuestionIDArg)
         db.session.delete(exerciseQuestion)
         db.session.commit()
-        return jsonify({"succeed": 'true'})
+        return jsonify({"succeed": True})
 
     def get(self):
         from app import db

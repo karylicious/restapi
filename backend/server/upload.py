@@ -19,6 +19,6 @@ class Upload(Resource):
             pathlib.Path(uploadDirectory).mkdir(parents=True, exist_ok=True)
 
             file.save(os.path.join(uploadDirectory, filename))
-            return jsonify({"succeed": 'true', "Info": "File uploaded successfully",  "d": userdir})
+            return jsonify({"succeed": True, "Info": "File uploaded successfully",  "d": userdir})
 
-        return jsonify({"succeed": 'false', "Info": "File not uploaded"})
+        return jsonify({"succeed": False, "Info": "File not uploaded"})

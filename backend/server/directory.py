@@ -11,4 +11,4 @@ class Directory(Resource):
         userDirectory = ROOT_DIR + '/uploads/' + args['dir']
         if os.path.isdir(userDirectory):
             shutil.rmtree(userDirectory)
-        return jsonify({"succeed": 'true'})
+        return jsonify({"succeed": True})

@@ -18,35 +18,40 @@ class ExerciseManagement(Resource):
         data = request.json
         soapClient = Project()
 
-        response = soapClient.deployServer(
-            data['uploadedfile'], data['selectedFileName'])
+        if data['uploadedfile']:
+            # User has uploaded a zip file
+            userFile = ROOT_DIR + '/uploads/' + data['uploadedfile']
+            if not os.path.isfile(userFile):
+                return jsonify({"succeed": False, "info": "Uploaded file has not been found. Please upload it again."})
 
-        if response is None:
-            return jsonify({"succeed": "false", "info": "Unexpected error has occured. Please try again."})
+            response = soapClient.deployServer(
+                data['uploadedfile'], data['selectedFileName'])
 
-        if "/" not in response:
-            # This means there is already a deployed web service with the same name as the one on the zip file
-            directory = data['uploadedfile'].split("/")
-            self.deleteDirectoryFromUploadsDirectory(directory)
+            if response is None:
+                return jsonify({"succeed": False, "info": "Unexpected error has occured. Please try again."})
 
-            return jsonify({"succeed": "false", "info": response})
+            if "/" not in response:
+                # This means there is already a deployed web service with the same name as the one on the zip file
+                directory = data['uploadedfile'].split("/")
+                self.deleteDirectoryFromUploadsDirectory(directory)
 
-        elif "/" in response:
-            serverDirectoryNameOnDeployment = response
-            total = Exercise.query.count() + 1
+                return jsonify({"succeed": False, "info": response})
 
-            new_exercise = Exercise("Exercise " + str(total), data['uploadedfile'], data['type'],
-                                    data['description'], data['expectedClientEntryPoint'], serverDirectoryNameOnDeployment)
-            db.session.add(new_exercise)
-            db.session.commit()
-
-            for question in data['questions']:
-                newExercisequestion = ExerciseQuestion(
-                    new_exercise.id, question['title'], question['description'], question['expectedInvokedMethod'], question['expectedOutput'], question['points'])
-                db.session.add(newExercisequestion)
+            elif "/" in response:
+                serverDirectoryNameOnDeployment = response
+                
+                new_exercise = Exercise(data['uploadedfile'], data['type'],
+                                        data['description'], data['expectedClientEntryPoint'], serverDirectoryNameOnDeployment)
+                db.session.add(new_exercise)
                 db.session.commit()
 
-            return jsonify({"succeed": "true"})
+                for question in data['questions']:
+                    newExercisequestion = ExerciseQuestion(
+                        new_exercise.id, question['title'], question['description'], question['expectedInvokedMethod'], question['expectedOutput'], question['points'])
+                    db.session.add(newExercisequestion)
+                    db.session.commit()
+
+                return jsonify({"succeed": True})
 
     def put(self):
         from app import db
@@ -59,31 +64,33 @@ class ExerciseManagement(Resource):
         exercise_by_id = Exercise.query.filter_by(id=data['id']).first()
 
         if exercise_by_id is None:
-            return jsonify({"succeed": 'false', "info": "There is no exercise with that id."})
+            return jsonify({"succeed": False, "info": "There is no exercise with that id."})
 
         exercise = Exercise.query.get(data['id'])
         soapClient = Project()
 
-        if data['uploadedfile'] is not None:
+        if data['uploadedfile']:
             # User has uploaded a zip file
             userFile = ROOT_DIR + '/uploads/' + data['uploadedfile']
             if not os.path.isfile(userFile):
-                return jsonify({"succeed": "false", "info": "Uploaded file has not been file. Please upload it again."})
+                return jsonify({"succeed": False, "info": "Uploaded file has not been found. Please upload it again."})
 
             response = soapClient.deployServer(
                 data['uploadedfile'], data['selectedFileName'])
 
             if response is None:
-                return jsonify({"succeed": "false", "info": "Unexpected error has occured. Please try again."})
+                return jsonify({"succeed": False, "info": "Unexpected error has occured. Please try again."})
 
             if "/" not in response:
                 # This means there is already a deployed web service with the same name as the one on the zip file
                 directory = data['uploadedfile'].split("/")
                 self.deleteDirectoryFromUploadsDirectory(directory)
 
-                return jsonify({"succeed": "false", "info": response})
+                return jsonify({"succeed": False, "info": response})
 
+            
             elif "/" in response:
+                print(exercise.serverDirectoryNameOnDeployment)
                 soapClient.undeployServer(
                     exercise.serverDirectoryNameOnDeployment)
 
@@ -109,7 +116,7 @@ class ExerciseManagement(Resource):
             db.session.add(newExerciseQuestion)
             db.session.commit()
 
-        return jsonify({"succeed": "true"})
+        return jsonify({"succeed": True})
 
     def deleteDirectoryFromUploadsDirectory(self, directory):
         userDirectory = ROOT_DIR + '/uploads/' + directory[0]
@@ -148,7 +155,7 @@ class ExerciseManagement(Resource):
             id=exerciseIDArg).first()  # revise this line
 
         if exercise_by_id is None:
-            return jsonify({"succeed": 'false', "info": "There is no exercise with that id."})
+            return jsonify({"succeed": False, "info": "There is no exercise with that id."})
 
         # should be this line instead
         exercise = Exercise.query.get(exerciseIDArg)
@@ -169,4 +176,4 @@ class ExerciseManagement(Resource):
         db.session.delete(exercise)
         db.session.commit()
         remaining = Exercise.query.count()
-        return jsonify({"succeed": 'true', "total": remaining})
+        return jsonify({"succeed": True, "total": remaining})
