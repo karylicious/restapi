@@ -1,19 +1,19 @@
-from flask import Flask  # , jsonify, request
+from flask import Flask  
 from flask_restful import Api
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
 from flask_cors import CORS
 import os
-from upload import Upload
 from client import TestClient
 from server import TestServer
 from clientserver import TestClientServer
-from directory import Directory
-#from tutorialmodel import Tutorial
-#from tutorialshema import TutorialSchema
-from tutorial import TutorialManagement
-from exercise import ExerciseManagement
-from exercisequestion import ExerciseQuestionManagement
+from zipfile import ZipFile
+from tutorial import Tutorial
+from lesson import Lesson
+from exercise import Exercise
+from exercisequestion import ExerciseQuestion
+from user import User
+from session import Session
 
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 app = Flask(__name__)
@@ -32,13 +32,15 @@ api = Api(app)
 db.create_all()
 
 
-api.add_resource(Upload, '/uploadfile')
-api.add_resource(Directory, '/deletedir')
+api.add_resource(ZipFile, '/zipfile')
 api.add_resource(TestClient, '/testclient')
 api.add_resource(TestServer, '/testserver')
 api.add_resource(TestClientServer, '/testclientserver')
-api.add_resource(TutorialManagement, '/tutorial')
-api.add_resource(ExerciseManagement, '/exercise')
-api.add_resource(ExerciseQuestionManagement, '/exercisequestion')
+api.add_resource(Tutorial, '/tutorial')
+api.add_resource(Lesson, '/lesson')
+api.add_resource(Exercise, '/exercise')
+api.add_resource(ExerciseQuestion, '/exercisequestion')
+api.add_resource(User, '/user')
+api.add_resource(Session, '/session')
 if __name__ == '__main__':
     app.run(debug=True)

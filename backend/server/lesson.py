@@ -2,23 +2,24 @@ from flask_restful import Resource
 from flask import Flask, jsonify, request
 
 
-class ExerciseQuestion(Resource):
+class Lesson(Resource):
     def delete(self):
         # This function is only used during debug mode
         from app import db
-        from models import ExerciseQuestion
+        from models import Lesson
+        from lessonschema import LessonSchema
 
         db.create_all()
         args = request.args
 
         try:
-            exerciseQuestion = ExerciseQuestion.query.get(
-                args['exercisequestionid'])
+            lesson = Lesson.query.get(
+                args['lessonid'])
 
-            if exerciseQuestion is None:
-                return jsonify({"succeed": False, "info": "There is no question with that id."})
+            if lesson is None:
+                return jsonify({"succeed": False, "info": "There is no lesson with that id."})
 
-            db.session.delete(exerciseQuestion)
+            db.session.delete(lesson)
             db.session.commit()
             return jsonify({"succeed": True})
 
@@ -27,19 +28,19 @@ class ExerciseQuestion(Resource):
 
     def get(self):
         from app import db
-        from models import ExerciseQuestion
-        from exercisequestionschema import ExerciseQuestionSchema
+        from models import Tutorial, Lesson
+        from lessonschema import LessonSchema
 
         db.create_all()
         args = request.args
 
         try:
-            questions = ExerciseQuestion.query.filter_by(
-                exercise_id=args['exerciseid']).all()
+            lessons = Lesson.query.filter_by(
+                tutorial_id=args['tutorialid']).all()
 
-            exercise_questions_schema = ExerciseQuestionSchema(
+            lessons_schema = LessonSchema(
                 many=True, strict=True)
-            result = exercise_questions_schema.dump(questions)
+            result = lessons_schema.dump(lessons)
             return jsonify(result.data)
 
         except:

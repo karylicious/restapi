@@ -1,103 +1,116 @@
 from flask_restful import Resource
 from flask import Flask, jsonify, request
-#import shutil
-#import os
-#from flask_sqlalchemy import SQLAlchemy
-#from flask_marshmallow import Marshmallow
-#from tutorialshema import TutorialSchema
-#from models import Tutorial
 
-#ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
-#app = Flask(__name__)
-#app.config.from_pyfile('./app.py')
-#init_app(app)
-#app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(ROOT_DIR, 'db.sqlite')
-#app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-#db = SQLAlchemy(app)
-#marshmallow = Marshmallow(app)
-
-# Init shema
-#tutorial_schema = TutorialSchema(strict=True)
-#tutorials_shema = TutorialSchema(many=True, strict=True)
-
-class TutorialManagement(Resource):
+class Exercise(Resource):
     def post(self):
         from app import db
-        from models import Tutorial
-        from tutorialshema import TutorialSchema
+        from models import Tutorial, Lesson
+
         db.create_all()
-        args = request.args
-        nameArg = args['name']
-        levelArg = args['level']
+        data = request.json
 
-        if not levelArg.isdigit():
-            return jsonify({"succeed": 'false', "info": "Invalid level."})
+        try:          
+            duplicatedTutorial = Tutorial.query.filter(
+                Tutorial.title == data['title']).first()
 
-        tutorial_by_name = Tutorial.query.filter_by(name=nameArg).first()       
-        tutorial_by_level = Tutorial.query.filter_by(level=levelArg).first()
+            if duplicatedTutorial is not None:
+                return jsonify({"succeed": False, "info": "There is already a tutorial with the same title."})
+                 
+            new_tutorial = Tutorial(data['title'])
+            db.session.add(new_tutorial)
+            db.session.commit()
 
-        if tutorial_by_level is not None :
-            return jsonify({"succeed": 'false', "info": "There is already a tutorial in that level! Please enter different one."})
-        elif tutorial_by_name is not None :
-            return jsonify({"succeed": 'false', "info": "There is already a tutorial with that name! Please enter different one."})
-        
-        new_tutorial = Tutorial(nameArg, levelArg)
-        db.session.add(new_tutorial)
-        db.session.commit()
-        tutorial_schema = TutorialSchema(strict=True)
-        return tutorial_schema.jsonify(new_tutorial)
-        #return jsonify({"succeed": 'true'})
+            for lesson in data['lessons']:
+                newLesson = Lesson(
+                    new_tutorial.id, lesson['title'], lesson['description'], lesson['link'])
+                db.session.add(newLesson)
+                db.session.commit()
 
-    def update(self):
+            return jsonify({"succeed": True})
+        except:
+            return jsonify({"succeed": False, "info": "Unexpected error has occured. Please try again."})
+
+    def put(self):
         from app import db
-        from models import Tutorial
-        from tutorialshema import TutorialSchema
+        from models import Tutorial, Lesson
+
         db.create_all()
-        
-        args = request.args
-        idArg = args['id']
-        nameArg = args['name']
-        levelArg = args['level']
+        data = request.json
 
-        if not levelArg.isdigit():
-            return jsonify({"succeed": 'false', "info": "Invalid level."})
+        try:
+            tutorial = Tutorial.query.get(data['id'])
 
-        tutorial_by_name = Tutorial.query.filter_by(name=nameArg).first()       
-        tutorial_by_level = Tutorial.query.filter_by(level=levelArg).first()
+            if tutorial is None:
+                return jsonify({"succeed": False, "info": "There is no tutorial with that id."})
 
-        if tutorial_by_level is not None :
-            return jsonify({"succeed": 'false', "info": "There is already a tutorial in that level! Please enter different one."})
-        elif tutorial_by_name is not None :
-            return jsonify({"succeed": 'false', "info": "There is already a tutorial with that name! Please enter different one."})
-        
-        tutorial = Tutorial.query.get(idArg)
-        tutorial.name = nameArg
-        tutorial.level = levelArg
+            duplicatedTutorial = Tutorial.query.filter(
+                Tutorial.title == data['title']).first()
 
-        db.session.commit()
-        tutorial_schema = TutorialSchema(strict=True)
-        return tutorial_schema.jsonify(tutorial)
+            if duplicatedTutorial is not None:
+                if duplicatedTutorial.id != data['id']:
+                    return jsonify({"succeed": False, "info": "There is already a tutorial with the same title."})
+               
 
+            tutorial.description = data['description']
+            db.session.commit()
+
+            Lesson.query.filter(
+                Lesson.tutorial_id == data['id']).delete()
+            db.session.commit()
+
+            for lesson in data['lessons']:
+                newLesson = Lesson(
+                    data['id'], lesson['title'], lesson['description'], lesson['link'])
+
+                db.session.add(newLesson)
+                db.session.commit()
+
+            return jsonify({"succeed": True})
+        except:
+            return jsonify({"succeed": False, "info": "Unexpected error has occured. Please try again."})
+    
     def get(self):
         from app import db
         from models import Tutorial
-        from tutorialshema import TutorialSchema
+        from tutorialschema import TutorialSchema
+
         db.create_all()
-        all_tutorials = Tutorial.query.all()
-        tutorials_shema = TutorialSchema(many=True, strict=True)
-        result = tutorials_shema.dump(all_tutorials)
-        return jsonify(result.data)
+
+        try:
+            if len(request.args):
+                args = request.args
+                tutorial_schema = TutorialSchema(strict=True)
+                tutorial = Tutorial.query.get(args['tutorialid'])
+
+                return tutorial_schema.jsonify(tutorial)
+
+            all_tutorial = Tutorial.query.all()
+            tutorials_schema = TutorialSchema(many=True, strict=True)
+            result = tutorials_schema.dump(all_tutorial)
+            return jsonify(result.data)
+        except:
+            return jsonify({"succeed": False, "info": "Unexpected error has occured. Please try again."})
 
     def delete(self):
         from app import db
-        from models import Tutorial
-        from tutorialshema import TutorialSchema
-        db.create_all()
-        args = request.args
-        idArg = args['id']
+        from models import Tutorial, Lesson
 
-        tutorial = Tutorial.query.get(idArg)
-        db.session.delete(tutorial)
-        db.session.commit()
-        return jsonify({"succeed": 'true'})
-        
+        db.create_all()        
+
+        try:
+            args = request.args
+            tutorial = Tutorial.query.get(args['tutorialid'])
+            
+            if tutorial is None:
+                return jsonify({"succeed": False, "info": "There is no tutorial with that id."})
+            
+            Lesson.query.filter(
+                Lesson.tutorial_id == args['tutorialid']).delete()
+            db.session.commit()
+
+            db.session.delete(tutorial)
+            db.session.commit()
+            remaining = Tutorial.query.count()
+            return jsonify({"succeed": True})
+        except:
+            return jsonify({"succeed": False, "info": "Unexpected error has occured. Please try again."})
