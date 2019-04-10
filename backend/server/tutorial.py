@@ -1,7 +1,7 @@
 from flask_restful import Resource
 from flask import Flask, jsonify, request
 
-class Exercise(Resource):
+class Tutorial(Resource):
     def post(self):
         from app import db
         from models import Tutorial, Lesson
@@ -51,7 +51,7 @@ class Exercise(Resource):
                     return jsonify({"succeed": False, "info": "There is already a tutorial with the same title."})
                
 
-            tutorial.description = data['description']
+            tutorial.title = data['title']
             db.session.commit()
 
             Lesson.query.filter(
