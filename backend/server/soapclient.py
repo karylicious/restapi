@@ -26,4 +26,12 @@ class Project:
 
     def undeployServer(self, selectedFileName):
         return CLIENT.service.undeployServer(selectedFileName)
+
+    def gradeClientServer(self, clientEntryPoint, userDir, selectedFileName):
+        selectedFileBytes = self.readFileIntoByte(userDir, selectedFileName)
+        return CLIENT.service.gradeClientAndServer(clientEntryPoint, selectedFileBytes, selectedFileName)
+
+    def gradeClient(self, clientEntryPoint, userDir, selectedFileName):
+        selectedFileBytes = self.readFileIntoByte(userDir, selectedFileName)
+        return CLIENT.service.testClientAndServer(clientEntryPoint, selectedFileBytes, selectedFileName)
    

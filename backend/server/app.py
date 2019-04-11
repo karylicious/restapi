@@ -4,9 +4,11 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
 from flask_cors import CORS
 import os
-from client import TestClient
-from server import TestServer
-from clientserver import TestClientServer
+from testclient import TestClient
+from testclientserver import TestClientServer
+from gradeclient import GradeClient
+from gradeclientserver import GradeClientServer
+
 from zipfile import ZipFile
 from tutorial import Tutorial
 from lesson import Lesson
@@ -34,8 +36,9 @@ db.create_all()
 
 api.add_resource(ZipFile, '/zipfile')
 api.add_resource(TestClient, '/testclient')
-api.add_resource(TestServer, '/testserver')
 api.add_resource(TestClientServer, '/testclientserver')
+api.add_resource(GradeClient, '/gradeclient')
+api.add_resource(GradeClientServer, '/gradeclientserver')
 api.add_resource(Tutorial, '/tutorial')
 api.add_resource(Lesson, '/lesson')
 api.add_resource(Exercise, '/exercise')

@@ -1,13 +1,13 @@
 from flask_restful import Resource
 from flask import Flask, jsonify, request
-from result import Result
+from gradingresult import GradingResult
 from soapclient import Project
 
-class TestClient(Resource):
+class GradeClient(Resource):
     def get(self):
         args = request.args
         soapClient = Project()
-        response = soapClient.testClient(
+        response = soapClient.gradeClient(
             args['clientEntryPoint'], args['dir'], args['selectedFileName'])
-        results = Result()
+        results = GradingResult()
         return jsonify(results.getJsonFormated(response))

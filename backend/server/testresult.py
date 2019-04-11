@@ -1,4 +1,4 @@
-class Result():
+class TestResult():
     def getJsonFormated(self, response):
         #Although the response['responseList'] is JSON serializable,
         #the response['testResultList'] is not (TypeError: Object of type testResult is not JSON serializable)
