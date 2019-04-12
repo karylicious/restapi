@@ -27,11 +27,11 @@ class Project:
     def undeployServer(self, selectedFileName):
         return CLIENT.service.undeployServer(selectedFileName)
 
-    def gradeClientServer(self, clientEntryPoint, userDir, selectedFileName):
+    def gradeClientServer(self, clientEntryPoint, userDir, selectedFileName, questions):
         selectedFileBytes = self.readFileIntoByte(userDir, selectedFileName)
-        return CLIENT.service.gradeClientAndServer(clientEntryPoint, selectedFileBytes, selectedFileName)
+        return CLIENT.service.gradeClientAndServer(clientEntryPoint, selectedFileBytes, selectedFileName, questions)
 
-    def gradeClient(self, clientEntryPoint, userDir, selectedFileName):
+    def gradeClient(self, clientEntryPoint, userDir, selectedFileName, questions):
         selectedFileBytes = self.readFileIntoByte(userDir, selectedFileName)
-        return CLIENT.service.testClientAndServer(clientEntryPoint, selectedFileBytes, selectedFileName)
+        return CLIENT.service.gradeClient(clientEntryPoint, selectedFileBytes, selectedFileName, questions)
    
