@@ -30,7 +30,6 @@ CORS(app)
 api = Api(app)
 
 
-# this is meant to be used only when initializing the database for the first time
 db.create_all()
 
 

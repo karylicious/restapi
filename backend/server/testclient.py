@@ -5,9 +5,12 @@ from soapclient import Project
 
 class TestClient(Resource):
     def get(self):
-        args = request.args
-        soapClient = Project()
-        response = soapClient.testClient(
-            args['clientEntryPoint'], args['dir'], args['selectedFileName'])
-        results = TestResult()
-        return jsonify(results.getJsonFormated(response))
+        try:
+            args = request.args
+            soapClient = Project()
+            response = soapClient.testClient(
+                args['clientEntryPoint'], args['dir'], args['selectedFileName'])
+            results = TestResult()
+            return jsonify(results.getJsonFormated(response))
+        except:
+            return {'responseList' : [], 'testResultList' : []}

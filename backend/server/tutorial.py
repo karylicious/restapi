@@ -28,6 +28,7 @@ class Tutorial(Resource):
 
             return jsonify({"succeed": True})
         except:
+            db.session.close()
             return jsonify({"succeed": False, "info": "Unexpected error has occured. Please try again."})
 
     def put(self):
@@ -67,6 +68,7 @@ class Tutorial(Resource):
 
             return jsonify({"succeed": True})
         except:
+            db.session.close()
             return jsonify({"succeed": False, "info": "Unexpected error has occured. Please try again."})
     
     def get(self):
@@ -89,6 +91,7 @@ class Tutorial(Resource):
             result = tutorials_schema.dump(all_tutorial)
             return jsonify(result.data)
         except:
+            db.session.close()
             return jsonify({"succeed": False, "info": "Unexpected error has occured. Please try again."})
 
     def delete(self):
@@ -113,4 +116,5 @@ class Tutorial(Resource):
             remaining = Tutorial.query.count()
             return jsonify({"succeed": True})
         except:
+            db.session.close()
             return jsonify({"succeed": False, "info": "Unexpected error has occured. Please try again."})

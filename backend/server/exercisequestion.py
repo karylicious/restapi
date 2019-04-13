@@ -23,6 +23,7 @@ class ExerciseQuestion(Resource):
             return jsonify({"succeed": True})
 
         except:
+            db.session.close()
             return jsonify({"succeed": False, "info": "Unexpected error has occured. Please try again."})
 
     def get(self):
@@ -43,4 +44,5 @@ class ExerciseQuestion(Resource):
             return jsonify(result.data)
 
         except:
+            db.session.close()
             return jsonify({"succeed": False, "info": "Unexpected error has occured. Please try again."})

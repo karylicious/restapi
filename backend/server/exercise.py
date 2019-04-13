@@ -31,6 +31,8 @@ class Exercise(Resource):
                         data['uploadedfile'], data['selectedFileName'])
 
                     if response is None:
+                        directory = data['uploadedfile'].split("/")
+                        self.deleteDirectoryFromUploadsDirectory(directory)
                         return jsonify({"succeed": False, "info": "Unexpected error has occured. Please try again."})
 
                     if "/" not in response:
@@ -43,7 +45,15 @@ class Exercise(Resource):
                     elif "/" in response:
                         serverDirectoryNameOnDeployment = response
 
-                new_exercise = Exercise(data['uploadedfile'], data['type'],
+
+                pathSplitted = data['uploadedfile'].split("/")
+
+                os.rename(os.path.join(ROOT_DIR + '/uploads', pathSplitted[0]),
+                os.path.join(ROOT_DIR + '/uploads', "exercise-"+pathSplitted[0]))
+                uploadedfilePath = "exercise-"+pathSplitted[0]+'/'+pathSplitted[1]
+               
+
+                new_exercise = Exercise(uploadedfilePath, data['type'],
                                         data['description'], data['expectedClientEntryPoint'], serverDirectoryNameOnDeployment)
                 db.session.add(new_exercise)
                 db.session.commit()
@@ -56,6 +66,7 @@ class Exercise(Resource):
 
                 return jsonify({"succeed": True})
         except:
+            db.session.close()
             return jsonify({"succeed": False, "info": "Unexpected error has occured. Please try again."})
 
     def put(self):
@@ -102,7 +113,14 @@ class Exercise(Resource):
                 directory = previousFile.split("/")
                 self.deleteDirectoryFromUploadsDirectory(directory)
 
-                exercise.uploadedfile = data['uploadedfile']
+                
+                pathSplitted = data['uploadedfile'].split("/")
+
+                os.rename(os.path.join(ROOT_DIR + '/uploads', pathSplitted[0]),
+                os.path.join(ROOT_DIR + '/uploads', "exercise-"+pathSplitted[0]))
+                uploadedfilePath = "exercise-"+pathSplitted[0]+'/'+pathSplitted[1]
+
+                exercise.uploadedfile = uploadedfilePath
 
             exercise.description = data['description']
             exercise.expectedClientEntryPoint = data['expectedClientEntryPoint']
@@ -121,6 +139,7 @@ class Exercise(Resource):
 
             return jsonify({"succeed": True})
         except:
+            db.session.close()
             return jsonify({"succeed": False, "info": "Unexpected error has occured. Please try again."})
 
     def deleteDirectoryFromUploadsDirectory(self, directory):
@@ -148,6 +167,7 @@ class Exercise(Resource):
             result = exercises_schema.dump(all_exercises)
             return jsonify(result.data)
         except:
+            db.session.close()
             return jsonify({"succeed": False, "info": "Unexpected error has occured. Please try again."})
 
     def delete(self):
@@ -181,7 +201,8 @@ class Exercise(Resource):
 
             db.session.delete(exercise)
             db.session.commit()
-            remaining = Exercise.query.count()
+            
             return jsonify({"succeed": True})
         except:
+            db.session.close()
             return jsonify({"succeed": False, "info": "Unexpected error has occured. Please try again."})

@@ -28,6 +28,7 @@ class Session(Resource):
             return jsonify({"succeed": True})
 
         except:
+            db.session.close()
             return jsonify({"succeed": False, "info": "Unexpected error has occured. Please try again."})
 
     def get(self):
@@ -47,4 +48,5 @@ class Session(Resource):
             return jsonify({"succeed": True, "loggedin": session.loggedin})
 
         except:
+            db.session.close()
             return jsonify({"succeed": False, "info": "Unexpected error has occured. Please try again."})

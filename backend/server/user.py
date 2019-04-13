@@ -25,6 +25,7 @@ class User(Resource):
             return jsonify({"succeed": True})
 
         except:
+            db.session.close()
             return jsonify({"succeed": False, "info": "Unexpected error has occured. Please try again."})
 
     def get(self):
@@ -35,24 +36,28 @@ class User(Resource):
 
         
         # Uncoment the following lines only when the whole database is clear, then comment them again
-        '''
-        admin = User("admin","")
-        db.session.add(admin)
-        db.session.commit()
+        try:
+            admin = User("admin","")
+            db.session.add(admin)
+            db.session.commit()
 
-        from models import Session
-        adminSession = Session("admin",False)
-        db.session.add(adminSession)
-        db.session.commit()'''
+            from models import Session
+            adminSession = Session("admin",False)
+            db.session.add(adminSession)
+            db.session.commit()
+        except:
+            print("Admin user already exists")
+            db.session.close()
 
         try:
-            args = request.args
+            args = request.args            
             user = User.query.filter(
                 User.username == args['username']).first()
-            
+                
             if not user:
                 return jsonify({"succeed": False, "info": "User not found. Please try again."})
 
+            print(user.password)
             if not args['password'] and not user.password:
                 return jsonify({"succeed": True})
 
@@ -62,4 +67,5 @@ class User(Resource):
             return jsonify({"succeed": False, "info": "User not found. Please try again."})
 
         except:
+            db.session.close()
             return jsonify({"succeed": False, "info": "User not found. Please try again."})
