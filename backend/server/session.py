@@ -5,12 +5,16 @@ from werkzeug.security import generate_password_hash, check_password_hash
 
 class Session(Resource):
     def put(self):
+        # This method will essentially login or logout a user
+
         from app import db
         from models import Session
 
-        db.create_all()
-
         try:
+            # This will attempt to create database and tables again
+            # Without it might generate an error about the table not exist on the database
+            db.create_all()
+        
             args = request.args
             session = Session.query.filter(
                 Session.username == args['username']).first()
@@ -20,6 +24,7 @@ class Session(Resource):
 
             if args['loggedin'] == "false":
                 session.loggedin = False
+
             elif args['loggedin'] == "true":
                 session.loggedin = True
              
@@ -32,12 +37,16 @@ class Session(Resource):
             return jsonify({"succeed": False, "info": "Unexpected error has occured. Please try again."})
 
     def get(self):
+        # This method will essentially return the login status of a user
+
         from app import db
         from models import Session
-
-        db.create_all()       
-
+        
         try:
+            # This will attempt to create database and tables again
+            # Without it might generate an error about the table not exist on the database
+            db.create_all()   
+        
             args = request.args
             session = Session.query.filter(
                 Session.username == args['username']).first()

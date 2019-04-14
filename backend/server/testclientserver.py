@@ -9,8 +9,10 @@ class TestClientServer(Resource):
         try:
             args = request.args
             soapClient = Project()
+
             response = soapClient.testClientServer(
                 args['clientEntryPoint'], args['dir'], args['selectedFileName'])
+                
             results = TestResult()
             return jsonify(results.getJsonFormated(response))
         except:

@@ -6,17 +6,24 @@ from soapclient import Project
 
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 
-
 class Exercise(Resource):
     def post(self):
+        # This method will essentially deploy the web service on the uploaded zip file
+        # It will rename the directory containing the uploaded zip file to differ from 
+        # from the ones uploaded by ordinary users
+        # It will create a new exercise and its associated questions on the database
+
         from app import db
         from models import Exercise, ExerciseQuestion
 
-        db.create_all()
-        data = request.json
-        soapClient = Project()
-
         try:
+
+            # This will attempt to create database and tables again
+            # Without it might generate an error about the table not exist on the database
+            db.create_all()
+            data = request.json
+            soapClient = Project()
+        
             if data['uploadedfile']:
                 # User has uploaded a zip file
                 userFile = ROOT_DIR + '/uploads/' + data['uploadedfile']
@@ -70,13 +77,19 @@ class Exercise(Resource):
             return jsonify({"succeed": False, "info": "Unexpected error has occured. Please try again."})
 
     def put(self):
+        # This method will essentially update the selected exercise
+        # It will deploy the web service of the exercise if the type of the exercise is client and there is no web service already with the same name as the one on the new uploaded zip file.
+        # If successful it will undeploy the previous web service and remove its directory
+        
         from app import db
         from models import Exercise, ExerciseQuestion
-
-        db.create_all()
-        data = request.json
-
+        
         try:
+            # This will attempt to create database and tables again
+            # Without it might generate an error about the table not exist on the database
+            db.create_all()
+            data = request.json
+        
             exercise = Exercise.query.get(data['id'])
 
             if exercise is None:
@@ -151,10 +164,12 @@ class Exercise(Resource):
         from app import db
         from models import Exercise
         from exerciseschema import ExerciseSchema
-
-        db.create_all()
-
+        
         try:
+            # This will attempt to create database and tables again
+            # Without it might generate an error about the table not exist on the database
+            db.create_all()
+        
             if len(request.args):
                 args = request.args
                 exercise_schema = ExerciseSchema(strict=True)
@@ -171,13 +186,19 @@ class Exercise(Resource):
             return jsonify({"succeed": False, "info": "Unexpected error has occured. Please try again."})
 
     def delete(self):
+        # This method will essentially remove the zip file of the selected exercise
+        # It will undeploy the web service in case the type of the exercise is 'client'
+        # It will remove the selected exercise from the database and its associated questions
+        
         from app import db
         from models import Exercise, ExerciseQuestion
         from exerciseschema import ExerciseSchema
-
-        db.create_all()        
-
+        
         try:
+            # This will attempt to create database and tables again
+            # Without it might generate an error about the table not exist on the database
+            db.create_all()  
+        
             args = request.args
             exercise = Exercise.query.get(args['exerciseid'])
             

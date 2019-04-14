@@ -3,13 +3,18 @@ from flask import Flask, jsonify, request
 
 class Tutorial(Resource):
     def post(self):
+        # This method will create a tutorial and its associated lessons
+
         from app import db
         from models import Tutorial, Lesson
+        
+        try:
+            # This will attempt to create database and tables again
+            # Without it might generate an error about the table not exist on the database
+            db.create_all()
 
-        db.create_all()
-        data = request.json
-
-        try:          
+            data = request.json
+                  
             duplicatedTutorial = Tutorial.query.filter(
                 Tutorial.title == data['title']).first()
 
@@ -32,13 +37,17 @@ class Tutorial(Resource):
             return jsonify({"succeed": False, "info": "Unexpected error has occured. Please try again."})
 
     def put(self):
+        # This method will update a tutorial and its associated lessons
         from app import db
         from models import Tutorial, Lesson
-
-        db.create_all()
-        data = request.json
-
+        
         try:
+            # This will attempt to create database and tables again
+            # Without it might generate an error about the table not exist on the database
+            db.create_all()
+
+            data = request.json
+        
             tutorial = Tutorial.query.get(data['id'])
 
             if tutorial is None:
@@ -76,9 +85,11 @@ class Tutorial(Resource):
         from models import Tutorial
         from tutorialschema import TutorialSchema
 
-        db.create_all()
-
         try:
+            # This will attempt to create database and tables again
+            # Without it might generate an error about the table not exist on the database
+            db.create_all()
+        
             if len(request.args):
                 args = request.args
                 tutorial_schema = TutorialSchema(strict=True)
@@ -98,9 +109,11 @@ class Tutorial(Resource):
         from app import db
         from models import Tutorial, Lesson
 
-        db.create_all()        
-
         try:
+            # This will attempt to create database and tables again
+            # Without it might generate an error about the table not exist on the database
+            db.create_all()     
+        
             args = request.args
             tutorial = Tutorial.query.get(args['tutorialid'])
             
@@ -113,7 +126,7 @@ class Tutorial(Resource):
 
             db.session.delete(tutorial)
             db.session.commit()
-            remaining = Tutorial.query.count()
+            
             return jsonify({"succeed": True})
         except:
             db.session.close()
