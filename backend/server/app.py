@@ -9,7 +9,7 @@ from testclientserver import TestClientServer
 from gradeclient import GradeClient
 from gradeclientserver import GradeClientServer
 
-from zipuserfile import ZipUserFile
+from userzipfile import UserZipFile
 from tutorial import Tutorial
 from lesson import Lesson
 from exercise import Exercise
@@ -44,7 +44,7 @@ CORS(app)
 api = Api(app)
 
 # Resource Routing
-api.add_resource(ZipUserFile, '/zipfile')
+api.add_resource(UserZipFile, '/zipfile')
 api.add_resource(TestClient, '/testclient')
 api.add_resource(TestClientServer, '/testclientserver')
 api.add_resource(GradeClient, '/gradeclient')

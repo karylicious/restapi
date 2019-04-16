@@ -7,7 +7,7 @@ import pathlib
 
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 
-class ZipUserFile(Resource):
+class UserZipFile(Resource):
     def post(self):
         # This method will upload a zip file
         try:
