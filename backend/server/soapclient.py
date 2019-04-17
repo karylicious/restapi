@@ -2,7 +2,7 @@ from zeep import Client
 import os
 
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
-CLIESER_WEB_SERVICE_HOSTNAME = 'http://ec2-52-56-160-237.eu-west-2.compute.amazonaws.com'
+CLIESER_WEB_SERVICE_HOSTNAME = 'http://ec2-52-56-160-237.eu-west-2.compute.amazonaws.com:8080'
 #CLIESER_WEB_SERVICE_HOSTNAME = 'http://localhost:8080'
 
 # This class invokes the web service that will test and grade automatically a project
