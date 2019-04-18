@@ -10,7 +10,7 @@ class Project:
 
     def readFileIntoByte(self, userDir, selectedFileName):
         try:
-            userFile = ROOT_DIR + '\\uploads\\' + userDir
+            userFile = ROOT_DIR + '/uploads/' + userDir
             return open(userFile, "rb").read()
         except:
             print("Exception on reading bytes of file")

@@ -55,9 +55,9 @@ class Tutorial(Resource):
 
             duplicatedTutorial = Tutorial.query.filter(
                 Tutorial.title == data['title']).first()
-
+     
             if duplicatedTutorial is not None:
-                if duplicatedTutorial.id != data['id']:
+                if duplicatedTutorial.id != int(data['id']):
                     return jsonify({"succeed": False, "info": "There is already a tutorial with the same title."})
                
 

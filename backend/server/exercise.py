@@ -36,7 +36,7 @@ class Exercise(Resource):
 
                     response = soapClient.deployServer(
                         data['uploadedfile'], data['selectedFileName'])
-
+                    
                     if response is None:
                         directory = data['uploadedfile'].split("/")
                         self.deleteDirectoryFromUploadsDirectory(directory)
