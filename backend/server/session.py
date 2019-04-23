@@ -10,11 +10,7 @@ class Session(Resource):
         from app import db
         from models import Session
 
-        try:
-            # This will attempt to create database and tables again
-            # Without it might generate an error about the table not exist on the database
-            db.create_all()
-        
+        try:        
             args = request.args
             session = Session.query.filter(
                 Session.username == args['username']).first()
@@ -33,7 +29,7 @@ class Session(Resource):
             return jsonify({"succeed": True})
 
         except:
-            db.session.close()
+            #db.session.close()
             return jsonify({"succeed": False, "info": "Unexpected error has occured. Please try again."})
 
     def get(self):
@@ -42,11 +38,7 @@ class Session(Resource):
         from app import db
         from models import Session
         
-        try:
-            # This will attempt to create database and tables again
-            # Without it might generate an error about the table not exist on the database
-            db.create_all()   
-        
+        try:        
             args = request.args
             session = Session.query.filter(
                 Session.username == args['username']).first()
@@ -57,5 +49,5 @@ class Session(Resource):
             return jsonify({"succeed": True, "loggedin": session.loggedin})
 
         except:
-            db.session.close()
+            #db.session.close()
             return jsonify({"succeed": False, "info": "Unexpected error has occured. Please try again."})

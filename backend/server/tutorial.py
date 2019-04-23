@@ -9,10 +9,6 @@ class Tutorial(Resource):
         from models import Tutorial, Lesson
         
         try:
-            # This will attempt to create database and tables again
-            # Without it might generate an error about the table not exist on the database
-            db.create_all()
-
             data = request.json
                   
             duplicatedTutorial = Tutorial.query.filter(
@@ -33,7 +29,7 @@ class Tutorial(Resource):
 
             return jsonify({"succeed": True})
         except:
-            db.session.close()
+            #db.session.close()
             return jsonify({"succeed": False, "info": "Unexpected error has occured. Please try again."})
 
     def put(self):
@@ -42,10 +38,6 @@ class Tutorial(Resource):
         from models import Tutorial, Lesson
         
         try:
-            # This will attempt to create database and tables again
-            # Without it might generate an error about the table not exist on the database
-            db.create_all()
-
             data = request.json
         
             tutorial = Tutorial.query.get(data['id'])
@@ -77,7 +69,7 @@ class Tutorial(Resource):
 
             return jsonify({"succeed": True})
         except:
-            db.session.close()
+            #db.session.close()
             return jsonify({"succeed": False, "info": "Unexpected error has occured. Please try again."})
     
     def get(self):
@@ -85,11 +77,7 @@ class Tutorial(Resource):
         from models import Tutorial
         from tutorialschema import TutorialSchema
 
-        try:
-            # This will attempt to create database and tables again
-            # Without it might generate an error about the table not exist on the database
-            db.create_all()
-        
+        try:        
             if len(request.args):
                 args = request.args
                 tutorial_schema = TutorialSchema(strict=True)
@@ -102,7 +90,7 @@ class Tutorial(Resource):
             result = tutorials_schema.dump(all_tutorial)
             return jsonify(result.data)
         except:
-            db.session.close()
+            #db.session.close()
             return jsonify({"succeed": False, "info": "Unexpected error has occured. Please try again."})
 
     def delete(self):
@@ -112,7 +100,7 @@ class Tutorial(Resource):
         try:
             # This will attempt to create database and tables again
             # Without it might generate an error about the table not exist on the database
-            db.create_all()     
+            #db.create_all()     
         
             args = request.args
             tutorial = Tutorial.query.get(args['tutorialid'])
@@ -129,5 +117,5 @@ class Tutorial(Resource):
             
             return jsonify({"succeed": True})
         except:
-            db.session.close()
+            #db.session.close()
             return jsonify({"succeed": False, "info": "Unexpected error has occured. Please try again."})

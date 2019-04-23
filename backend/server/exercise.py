@@ -17,10 +17,6 @@ class Exercise(Resource):
         from models import Exercise, ExerciseQuestion
 
         try:
-
-            # This will attempt to create database and tables again
-            # Without it might generate an error about the table not exist on the database
-            db.create_all()
             data = request.json
             soapClient = Project()
         
@@ -61,19 +57,19 @@ class Exercise(Resource):
                
 
                 new_exercise = Exercise(uploadedfilePath, data['type'],
-                                        data['description'], data['expectedClientEntryPoint'], serverDirectoryNameOnDeployment)
+                                        data['description'], data['expectedcliententrypoint'], serverDirectoryNameOnDeployment)
                 db.session.add(new_exercise)
                 db.session.commit()
 
                 for question in data['questions']:
                     newExercisequestion = ExerciseQuestion(
-                        new_exercise.id, question['title'], question['description'], question['expectedInvokedMethod'], question['expectedOutput'], question['points'])
+                        new_exercise.id, question['title'], question['description'], question['expectedinvokedmethod'], question['expectedoutput'], question['points'])
                     db.session.add(newExercisequestion)
                     db.session.commit()
 
                 return jsonify({"succeed": True})
         except:
-            db.session.close()
+            #db.session.close()
             return jsonify({"succeed": False, "info": "Unexpected error has occured. Please try again."})
 
     def put(self):
@@ -85,9 +81,6 @@ class Exercise(Resource):
         from models import Exercise, ExerciseQuestion
         
         try:
-            # This will attempt to create database and tables again
-            # Without it might generate an error about the table not exist on the database
-            db.create_all()
             data = request.json
         
             exercise = Exercise.query.get(data['id'])
@@ -118,9 +111,9 @@ class Exercise(Resource):
 
                     elif "/" in response:
                         soapClient.undeployServer(
-                            exercise.serverDirectoryNameOnDeployment)
+                            exercise.serverdirectorynameondeployment)
 
-                    exercise.serverDirectoryNameOnDeployment = response
+                    exercise.serverdirectorynameondeployment = response
 
                 previousFile = exercise.uploadedfile
                 directory = previousFile.split("/")
@@ -136,7 +129,7 @@ class Exercise(Resource):
                 exercise.uploadedfile = uploadedfilePath
 
             exercise.description = data['description']
-            exercise.expectedClientEntryPoint = data['expectedClientEntryPoint']
+            exercise.expectedcliententrypoint = data['expectedcliententrypoint']
             db.session.commit()
 
             ExerciseQuestion.query.filter(
@@ -145,14 +138,14 @@ class Exercise(Resource):
 
             for question in data['questions']:
                 newExerciseQuestion = ExerciseQuestion(
-                    data['id'], question['title'], question['description'], question['expectedInvokedMethod'], question['expectedOutput'], question['points'])
+                    data['id'], question['title'], question['description'], question['expectedinvokedmethod'], question['expectedoutput'], question['points'])
 
                 db.session.add(newExerciseQuestion)
                 db.session.commit()
 
             return jsonify({"succeed": True})
         except:
-            db.session.close()
+            #db.session.close()
             return jsonify({"succeed": False, "info": "Unexpected error has occured. Please try again."})
 
     def deleteDirectoryFromUploadsDirectory(self, directory):
@@ -165,11 +158,7 @@ class Exercise(Resource):
         from models import Exercise
         from exerciseschema import ExerciseSchema
         
-        try:
-            # This will attempt to create database and tables again
-            # Without it might generate an error about the table not exist on the database
-            db.create_all()
-        
+        try:        
             if len(request.args):
                 args = request.args
                 exercise_schema = ExerciseSchema(strict=True)
@@ -182,7 +171,7 @@ class Exercise(Resource):
             result = exercises_schema.dump(all_exercises)
             return jsonify(result.data)
         except:
-            db.session.close()
+            #db.session.close()
             return jsonify({"succeed": False, "info": "Unexpected error has occured. Please try again."})
 
     def delete(self):
@@ -194,11 +183,7 @@ class Exercise(Resource):
         from models import Exercise, ExerciseQuestion
         from exerciseschema import ExerciseSchema
         
-        try:
-            # This will attempt to create database and tables again
-            # Without it might generate an error about the table not exist on the database
-            db.create_all()  
-        
+        try:        
             args = request.args
             exercise = Exercise.query.get(args['exerciseid'])
             
@@ -212,9 +197,9 @@ class Exercise(Resource):
             if os.path.isdir(userDirectory):
                 shutil.rmtree(userDirectory)
            
-            if exercise.exerciseType == 'client':
+            if exercise.exercisetype == 'client':
                 soapClient = Project()
-                soapClient.undeployServer(exercise.serverDirectoryNameOnDeployment)
+                soapClient.undeployServer(exercise.serverdirectorynameondeployment)
           
             ExerciseQuestion.query.filter(
                 ExerciseQuestion.exercise_id == args['exerciseid']).delete()
@@ -225,5 +210,5 @@ class Exercise(Resource):
             
             return jsonify({"succeed": True})
         except:
-            db.session.close()
+            #db.session.close()
             return jsonify({"succeed": False, "info": "Unexpected error has occured. Please try again."})

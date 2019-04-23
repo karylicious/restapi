@@ -26,18 +26,18 @@ class Lesson (db.Model):
 class Exercise (db.Model):
     id = db.Column(db.Integer, primary_key=True)
     uploadedfile = db.Column(db.String(100), unique=True, nullable=False)
-    exerciseType = db.Column(db.String(20), nullable=False)
+    exercisetype = db.Column(db.String(20), nullable=False)
     description = db.Column(db.Text, nullable=False)
-    expectedClientEntryPoint = db.Column(db.String(200), nullable=False)
-    serverDirectoryNameOnDeployment = db.Column(db.String(200))
+    expectedcliententrypoint = db.Column(db.String(200), nullable=False)
+    serverdirectorynameondeployment = db.Column(db.String(200))
     exercisequestions = db.relationship('ExerciseQuestion')
 
     def __init__(self, uploadedfile, exerciseType, description, expectedClientEntryPoint, serverDirectoryNameOnDeployment):
         self.uploadedfile = uploadedfile
-        self.exerciseType = exerciseType
+        self.exercisetype = exerciseType
         self.description = description
-        self.expectedClientEntryPoint = expectedClientEntryPoint
-        self.serverDirectoryNameOnDeployment = serverDirectoryNameOnDeployment
+        self.expectedcliententrypoint = expectedClientEntryPoint
+        self.serverdirectorynameondeployment = serverDirectoryNameOnDeployment
 
 
 class ExerciseQuestion (db.Model):
@@ -46,19 +46,19 @@ class ExerciseQuestion (db.Model):
         'exercise.id'), nullable=False)
     title = db.Column(db.String(100), nullable=False)
     description = db.Column(db.Text, nullable=False)
-    expectedOutput = db.Column(db.String(100), nullable=False)
-    expectedInvokedMethod = db.Column(db.String(100), nullable=False)
+    expectedoutput = db.Column(db.String(100), nullable=False)
+    expectedinvokedmethod = db.Column(db.String(100), nullable=False)
     points = db.Column(db.Float, nullable=False)
 
     def __init__(self, exercise_id, title, description, expectedInvokedMethod, expectedOutput, points):
         self.exercise_id = exercise_id
         self.title = title
         self.description = description
-        self.expectedInvokedMethod = expectedInvokedMethod
-        self.expectedOutput = expectedOutput
+        self.expectedinvokedmethod = expectedInvokedMethod
+        self.expectedoutput = expectedOutput
         self.points = points
 
-class User (db.Model):
+class Users (db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(100), unique=True, nullable=False)
     password = db.Column(db.Text, nullable=False)

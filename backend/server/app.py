@@ -21,9 +21,7 @@ ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 app = Flask(__name__)
 
 # Database configuration
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + \
-    os.path.join(ROOT_DIR, 'db.sqlite')
-
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://rzcnjathadjwui:3eab08850b0bb6f2b139cd9febc71aee3b9e17cff7a3ebda3da0c805d71ed0e6@ec2-174-129-208-118.compute-1.amazonaws.com:5432/d6bv138l59bvfm'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # Order matters: Flask-SQLAlchemy must be initialized before Flask-Marshmallow.
@@ -31,10 +29,6 @@ db = SQLAlchemy(app)
 
 # marshmallow is a serialization/deserialization library
 marshmallow = Marshmallow(app)
-
-# Creation of tables and database
-db.create_all()
-
 
 # The following line is just a workround for the error: cross-origin read blocking (corb) 
 # blocked cross-origin response with mime type application/json

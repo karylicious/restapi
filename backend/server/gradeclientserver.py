@@ -22,9 +22,9 @@ class GradeClientServer(Resource):
 
             for question in questions:
                 xmlQuestionList += '<question>'
-                xmlQuestionList += '<expectedinvokedmethod>'+ question.expectedInvokedMethod + '</expectedinvokedmethod>'    
+                xmlQuestionList += '<expectedinvokedmethod>'+ question.expectedinvokedmethod + '</expectedinvokedmethod>'    
                 xmlQuestionList += '<points>' + str(question.points) +'</points>'  
-                xmlQuestionList += '<expectedoutput>' + question.expectedOutput + '</expectedoutput>'
+                xmlQuestionList += '<expectedoutput>' + question.expectedoutput + '</expectedoutput>'
                 xmlQuestionList += '</question>'     
 
             xmlQuestionList +='</questions>'      
